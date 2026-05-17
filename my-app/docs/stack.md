@@ -5,7 +5,7 @@
 | 項目 | バージョン | 備考 |
 |---|---|---|
 | Ruby | 3.3.x | `.ruby-version` で固定 |
-| Rails | 7.2.x | フルスタック構成 |
+| Rails | 8.1.x | フルスタック構成 |
 | Node.js | 22.x (Active LTS) | importmap 利用のため最小限 |
 | MySQL | 8.x | 開発は Docker (`compose.yaml`)、本番はマネージド |
 | Docker | 24.x 以上 | 開発時の DB 起動に必須 |
@@ -15,7 +15,7 @@
 
 | Gem | 用途 |
 |---|---|
-| `rails` (~> 7.2) | フレームワーク本体 |
+| `rails` (~> 8.1) | フレームワーク本体 |
 | `mysql2` | MySQL アダプタ |
 | `puma` | アプリサーバ |
 | `importmap-rails` | JS 配信 |
@@ -40,6 +40,24 @@
 | `factory_bot_rails` | テストデータ |
 | `faker` | ダミーデータ |
 | `letter_opener` | 開発時メール確認 |
+
+## ジョブ・キャッシュ・WebSocket
+
+Rails 8 標準の Solid シリーズ（Solid Queue / Solid Cache / Solid Cable）が
+`rails new` で自動的に組み込まれるが、**本プロジェクトでは現時点で利用しない**。
+
+- 非同期ジョブ・キャッシュ・リアルタイム通信を必要とする機能は本フェーズでは作らない
+- ただし将来の拡張に備えて、`rails new` が生成した Solid 関連のファイル・
+  Gem・マイグレーションは**削除せずそのまま残す**
+  - `Gemfile` の `solid_queue`, `solid_cache`, `solid_cable`
+  - `config/cache.yml`, `config/queue.yml`, `config/cable.yml`
+  - 関連マイグレーション（`db:migrate` でそのまま適用する）
+- `Rails.cache` は development では `:memory_store`、test では `:null_store` を使う（Rails デフォルト）
+- メール送信（Devise のパスワード再発行等）は同期送信で良い。
+  development では `letter_opener` で確認するため非同期化は不要
+- `Procfile.dev` に Solid Queue のワーカー（`bin/jobs`）は**追加しない**。
+  `rails new` が自動で追加した場合は削除する
+- Sidekiq / Resque などの代替ジョブキューも導入しない。Redis も追加しない
 
 ## ビュー / フロント
 

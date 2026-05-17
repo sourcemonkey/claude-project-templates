@@ -86,6 +86,12 @@ bin/rails db:migrate
 
 エラーが出たら止めて報告。勝手に `db:reset` しない。
 
+`rails new` で生成済みの Solid Queue / Solid Cache / Solid Cable 用マイグレーション
+（`solid_queue_*`, `solid_cache_entries`, `solid_cable_messages` など）も
+そのまま順序通りに `db:migrate` で適用される。**これらのマイグレーションには
+手を加えない**。本プロジェクトではテーブルを実際には使わないが、Rails 側で
+存在を前提とした初期化処理があるため削除しない。
+
 ### モデルテスト
 
 各モデルに最低限のバリデーションテストを書く（`test/models/`）。
@@ -98,7 +104,7 @@ bin/rails db:migrate
 
 ## このフェーズの完了基準
 
-- [ ] `bin/rails db:migrate:status` で全マイグレーションが up
+- [ ] `bin/rails db:migrate:status` で全マイグレーションが up（業務テーブル + Solid 系テーブル）
 - [ ] `bin/rails test:models` が all green
 - [ ] `db/schema.rb` が生成され、`docs/db-schema.md` の定義と一致
 - [ ] 各モデルのアソシエーション・バリデーション・enum が定義済み
@@ -108,6 +114,8 @@ bin/rails db:migrate
 - Controller / View（Phase 3 で実施）
 - Service オブジェクト（Phase 3 で実施）
 - Seeds（Phase 4 で実施）
+- `rails new` が生成した Solid Queue / Solid Cache / Solid Cable の
+  マイグレーション・モデル・設定ファイルへの手出し（そのまま放置する）
 
 ## 完了後
 

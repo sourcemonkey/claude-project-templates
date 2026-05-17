@@ -23,7 +23,7 @@
 
 このプロジェクトは 4 フェーズで構築する。各フェーズは `.claude/commands/` のスラッシュコマンドで実行する。
 
-1. `/scaffold-phase1-skeleton` — Rails 雛形 + 依存導入
+1. `/scaffold-phase1-skeleton` — Rails 雛形 + 依存導入 + Docker DB 起動
 2. `/scaffold-phase2-models` — DB スキーマ + Model + マイグレーション
 3. `/scaffold-phase3-ui` — 認証 + Controller + View + 認可
 4. `/scaffold-phase4-finalize` — Seeds + テスト + 起動確認
@@ -45,3 +45,7 @@
 - **JS フレームワーク（React/Vue）を導入しない**。Hotwire（Turbo + Stimulus）で完結させる。
 - **Devise を使う**。自前認証を書かない。
 - **Pundit を使う**。CanCanCan や自前認可ロジックを書かない。
+- **非同期ジョブを使わない**。Rails 8 標準の Solid Queue / Solid Cache / Solid Cable は
+  `rails new` の生成物として残すが、ワーカーは起動しない。
+  Sidekiq / Redis などの追加導入もしない。詳細は `docs/stack.md` の
+  「ジョブ・キャッシュ・WebSocket」セクション参照。

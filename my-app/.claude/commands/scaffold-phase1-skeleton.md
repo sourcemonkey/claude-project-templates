@@ -96,6 +96,17 @@ rails new . \
 
 既存ファイル（`CLAUDE.md`, `docs/`, `.claude/`, `compose.yaml`, `docker/`）は上書きしないよう注意。
 
+Rails 8.1 ではデフォルトで Solid Queue / Solid Cache / Solid Cable が組み込まれる。
+本プロジェクトでは使わない方針だが、**生成されたファイル・Gem・マイグレーションは
+削除せずそのまま残す**（詳細は `docs/stack.md` の「ジョブ・キャッシュ・WebSocket」
+セクション参照）。具体的には:
+
+- `Gemfile` の `solid_queue`, `solid_cache`, `solid_cable` は残す
+- `config/cache.yml`, `config/queue.yml`, `config/cable.yml` は残す
+- 関連マイグレーションは `db:migrate` でそのまま適用する
+- `Procfile.dev` に `bin/jobs`（Solid Queue ワーカー）の行が含まれていた場合は**削除する**
+  （ワーカーは起動しない方針のため）
+
 ### 5. config/database.yml の調整
 
 - `encoding: utf8mb4` を明示
@@ -103,6 +114,11 @@ rails new . \
 - `host` / `username` / `password` / `port` を環境変数経由で読み込む形に変更
 - Docker の DB は `127.0.0.1:3306` でホスト側に公開されているため、ホスト Rails からはローカル MySQL と同じ接続情報で扱える
 - `docs/stack.md` の「MySQL 設定の規約」セクションの YAML サンプルに従う
+
+Rails 8 では `cache`, `queue`, `cable` 用の追加 DB が `config/database.yml` に
+別接続として定義されている場合がある。本プロジェクトでは**すべて同一の MySQL を使う**
+構成に統一する。SQLite を使う設定が残っている場合は MySQL アダプタの設定に
+書き換える（同じ MySQL の同じ DB を使えば良い）。
 
 ### 6. Gemfile に追加
 
@@ -124,6 +140,7 @@ rails new . \
    - `bin/rails generate devise:install`
    - `config/environments/development.rb` に `config.action_mailer.default_url_options = { host: "localhost", port: 3000 }`
    - `letter_opener` を development の delivery_method に設定
+   - Devise のメール送信は**同期で良い**（`deliver_now`）。`deliver_later` への切り替えはしない
 
 7-2. **Pundit の初期セットアップ**:
    - `bin/rails generate pundit:install`
@@ -189,6 +206,7 @@ system! "bin/rails db:prepare"
 - [ ] `Gemfile.lock` がコミット対象に入っている
 - [ ] Devise / Pundit の初期化済み
 - [ ] `.env.example` と `.gitignore` が整備されている
+- [ ] `Procfile.dev` に Solid Queue ワーカー（`bin/jobs`）の行が**含まれていない**
 
 ## やらないこと
 
@@ -196,6 +214,8 @@ system! "bin/rails db:prepare"
 - Controller / View 生成（Phase 3 で実施）
 - Seeds（Phase 4 で実施）
 - Rails 本体のコンテナ化（プロジェクト方針として行わない）
+- Solid Queue ワーカーの起動設定（本プロジェクトでは非同期ジョブを使わない）
+- Sidekiq / Redis の追加（Solid 系を残すだけで触らない）
 
 ## 完了後
 
