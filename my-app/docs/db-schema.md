@@ -119,7 +119,7 @@ audit_logs (独立、polymorphic)
 | target_type | string | NOT NULL |
 | target_id | bigint | NOT NULL |
 | action | string | NOT NULL（例: `create`, `update`, `destroy`, `approve`） |
-| changes_json | jsonb | |
+| changes_json | json | |
 | created_at | datetime | |
 
 インデックス: `(target_type, target_id)`, `user_id`

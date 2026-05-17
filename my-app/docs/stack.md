@@ -7,14 +7,14 @@
 | Ruby | 3.3.x | `.ruby-version` で固定 |
 | Rails | 7.2.x | フルスタック構成 |
 | Node.js | 20.x | importmap 利用のため最小限 |
-| PostgreSQL | 16.x | 開発・本番とも |
+| MySQL | 8.x | 開発・本番とも |
 
 ## フレームワーク・主要 Gem
 
 | Gem | 用途 |
 |---|---|
 | `rails` (~> 7.2) | フレームワーク本体 |
-| `pg` | PostgreSQL アダプタ |
+| `mysql2` | MySQL アダプタ |
 | `puma` | アプリサーバ |
 | `importmap-rails` | JS 配信 |
 | `turbo-rails` | Hotwire / Turbo |
@@ -70,7 +70,7 @@
 `.env` で管理。`.env.example` を必ず同期する。
 
 ```
-DATABASE_URL=postgres://localhost/bookkeeper_development
+DATABASE_URL=mysql2://root:password@127.0.0.1:3306/bookkeeper_development
 RAILS_MASTER_KEY=（config/master.key の中身）
 DEFAULT_FROM_EMAIL=no-reply@example.local
 ```

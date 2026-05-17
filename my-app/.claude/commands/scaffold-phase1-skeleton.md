@@ -9,11 +9,11 @@ description: フェーズ1 - Rails 雛形を生成し依存を導入する
 ## 実行手順
 
 1. **Ruby バージョン確認**: `ruby -v` で 3.3.x が入っているか確認。なければ `.tool-versions` または `.ruby-version` でユーザーに指示し中断。
-2. **PostgreSQL の起動確認**: `pg_isready` で確認。起動していなければユーザーに案内し中断。
+2. **MySQL の起動確認**: `mysqladmin ping -h 127.0.0.1` で確認。起動していなければユーザーに案内し中断。
 3. **Rails アプリ生成**:
    ```
    rails new . \
-     --database=postgresql \
+     --database=mysql \
      --css=tailwind \
      --javascript=importmap \
      --skip-test=false \
