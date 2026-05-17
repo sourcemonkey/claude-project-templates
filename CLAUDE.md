@@ -3,10 +3,10 @@
 このファイルは配下の全プロジェクトで適用されるチーム共通ルールです。
 プロジェクト固有のルールは各プロジェクトの `CLAUDE.md` に記述します。
 
-@team-rules/coding-standards.md
-@team-rules/git-workflow.md
-@team-rules/review-policy.md
-@team-rules/security.md
+@team-rules/coding-standards.md  
+@team-rules/git-workflow.md  
+@team-rules/review-policy.md  
+@team-rules/security.md  
 
 ## 厳守事項（最優先）
 

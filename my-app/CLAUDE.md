@@ -5,12 +5,12 @@
 
 ## 仕様ドキュメント
 
-@docs/stack.md
-@docs/architecture.md
-@docs/db-schema.md
-@docs/screens.md
-@docs/api-spec.md
-@docs/seeds.md
+@docs/stack.md  
+@docs/architecture.md  
+@docs/db-schema.md  
+@docs/screens.md  
+@docs/api-spec.md  
+@docs/seeds.md  
 
 ## このプロジェクトでの作業方針
 
