@@ -9,7 +9,7 @@
       "Bash(bin/dev)",
       "Bash(bin/setup)",
       "Bash(docker compose *)",
-      "Bash(docker version)",
+      "Bash(docker version*)",
       "Bash(rails new *)",
       "Bash(mkdir *)",
       "Bash(touch *)",
@@ -20,8 +20,11 @@
       "Bash(curl *)",
       "Bash(lsof *)",
       "Bash(nc *)",
+      "Bash(ruby -v)",
+      "Bash(rbenv versions *)",
       "Edit",
-      "Write"
+      "Write",
+      "Skill(verify)"
     ],
     "deny": [
       "Bash(rm -rf *)",
