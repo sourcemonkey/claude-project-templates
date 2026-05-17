@@ -6,7 +6,7 @@
 |---|---|---|
 | Ruby | 3.3.x | `.ruby-version` で固定 |
 | Rails | 7.2.x | フルスタック構成 |
-| Node.js | 20.x | importmap 利用のため最小限 |
+| Node.js | 22.x (Active LTS) | importmap 利用のため最小限 |
 | MySQL | 8.x | 開発は Docker (`compose.yaml`)、本番はマネージド |
 | Docker | 24.x 以上 | 開発時の DB 起動に必須 |
 | Docker Compose | v2 (`docker compose` コマンド) | `docker-compose` (旧 v1) は使わない |
