@@ -1,45 +1,24 @@
-# Project: 蔵書管理アプリ (bookkeeper)
+# チーム共通開発ルール
 
-@docs/stack.md
-@docs/architecture.md
-@docs/db-schema.md
-@docs/screens.md
-@docs/api-spec.md
-@docs/seeds.md
+このファイルは配下の全プロジェクトで適用されるチーム共通ルールです。
+プロジェクト固有のルールは各プロジェクトの `CLAUDE.md` に記述します。
 
-## このプロジェクトでの作業方針
+@team-rules/coding-standards.md
+@team-rules/git-workflow.md
+@team-rules/review-policy.md
+@team-rules/security.md
 
-- 新規生成時は `docs/` の仕様を**すべて満たすこと**を最優先。
-- `bin/setup` 一発で起動可能な状態にする。
-- 各機能の実装後に `bin/rails test` を実行。
-- 画面は `docs/screens.md` の URL 設計と一致させる。
+## 厳守事項（最優先）
 
-## フェーズ実行
+1. **破壊的コマンドは事前確認**: `rm -rf`, `db:drop`, `git reset --hard`, `git push --force` 等は実行前に必ずユーザーに確認する。
+2. **秘密情報の取り扱い**: API キー・パスワード・トークン等はソースコードにハードコードしない。`.env` に置き、`.env.example` をリポジトリに含めて同期する。
+3. **依存追加は理由を明示**: Gem / Composer パッケージを追加する際は、その目的を 1 行で説明する。
+4. **不明点は推測しない**: 仕様が曖昧な場合は実装を進める前に質問する。勝手な拡張解釈をしない。
+5. **完了の自己申告前にテスト**: 「実装完了」と報告する前に必ずテストと lint を通す。
 
-新規プロジェクトの生成は以下の順で行う:
+## コミュニケーション
 
-1. `/scaffold-phase1-skeleton` — Rails 雛形 + 依存導入 + Docker DB 起動
-2. `/scaffold-phase2-models` — DB スキーマ + Model + マイグレーション
-3. `/scaffold-phase3-ui` — 認証 + Controller + View + 認可
-4. `/scaffold-phase4-finalize` — Seeds + テスト + 起動確認
+- 進捗報告は「やったこと / 次にやること / 詰まっていること」の 3 点で簡潔に。
+- コード貼り付けで済む説明を、長文の散文で説明しない。
+- 「たぶん」「おそらく」で実装を進めない。確認するか調べる。
 
-各フェーズ完了時、`/verify` で完了基準を満たしているかセルフチェックする。
-
-## 完了の定義（プロジェクト全体）
-
-- [ ] `docker compose up -d db` で開発用 DB が起動する
-- [ ] `bin/setup` 一発でセットアップ完了
-- [ ] `bin/dev` で起動し、ログインから主要画面遷移まで動作
-- [ ] `db:seed` で各画面に表示すべきサンプルデータが入る
-- [ ] `bin/rails test` が all green
-- [ ] `bin/rubocop` が違反 0
-- [ ] README に「起動方法」「テストアカウント」が記載されている
-
-## 重要な制約
-
-- **API モードにしない**。フルスタック Rails（ERB + Hotwire）。
-- **JS フレームワーク（React/Vue）を導入しない**。Hotwire（Turbo + Stimulus）で完結させる。
-- **Devise を使う**。自前認証を書かない。
-- **Pundit を使う**。CanCanCan や自前認可ロジックを書かない。
-- **開発 DB は Docker で起動する**。ホスト側に直接 MySQL をインストールしない前提。
-- **Rails 本体はホスト側で動かす**。アプリの `Dockerfile` 化や `bin/dev` の docker compose 化は行わない。
