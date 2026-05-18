@@ -40,6 +40,18 @@ feat(books): add stock check before lending
 ## Claude Code が守ること
 
 - ユーザーの明示的な指示なしに `git push` しない。
-- `git commit` は単位ごとに分けて行う。1 コミットに無関係な変更を混ぜない。
+- ユーザーの明示的な指示なしに `git commit` しない。コミットすべき
+  タイミングと判断したら、コミットメッセージ案を提示してユーザーに
+  確認を取る。
+- **フェーズ実行中（`/scaffold-phase1-skeleton` 等のスラッシュコマンド
+  実行中）は、Claude Code 側からコミットの提案・実行を行わない**。
+  各フェーズは一連の作業として完了させ、`/verify` 後のユーザー判断に
+  委ねる。
+- `git commit` を行う際は、単位ごとに分けて行う。1 コミットに無関係な
+  変更を混ぜない。
 - `git add .` ではなくファイルを明示的に指定する。
-- 既存のコミット履歴を書き換える操作（`rebase -i`, `commit --amend`, `push --force`）は必ず事前確認。
+- Conventional Commits 規約に従ったメッセージ（`feat` / `fix` / `chore` /
+  `refactor` / `docs` / `test` / `style`）を使う。
+- `Co-Authored-By` トレーラーを付ける（Claude Code であることの明示）。
+- 既存のコミット履歴を書き換える操作（`rebase -i`, `commit --amend`,
+  `push --force`）は必ず事前確認。
