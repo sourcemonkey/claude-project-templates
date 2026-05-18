@@ -8,11 +8,22 @@ description: フェーズ1 - Rails 雛形を生成し依存を導入する（DB 
 DBMS は **MySQL 8.x** を **Docker コンテナ** で起動して利用する。
 Rails 本体はホスト側で動かす。
 
+## 前提
+
+以下はテンプレートに同梱済み。Phase 1 で新規作成しない:
+
+- `my-app/compose.yaml`
+- `my-app/docker/mysql/conf.d/.keep`
+- `my-app/.ruby-version`
+- ルート直下の `.ruby-version`, `env.example`
+
+これらの内容を確認・編集する必要はない（中身は `docs/stack.md` の規約に合致した状態でコミット済み）。
+
 ## 実行手順
 
 ### 1. 事前確認
 
-1. **Ruby バージョン確認**: `ruby -v` で 3.3.x が入っているか確認。なければ `.tool-versions` または `.ruby-version` でユーザーに指示し中断。
+1. **Ruby バージョン確認**: `my-app/` 内で `ruby -v` を実行し 3.3.x が出るか確認。出ない場合は `rbenv install` 等でインストールを促し中断。
 2. **Docker の確認**:
    - `docker version` で Docker Engine が利用可能か確認
    - `docker compose version` で Compose v2 が利用可能か確認
@@ -21,48 +32,9 @@ Rails 本体はホスト側で動かす。
    - `lsof -i :3306` または `nc -z 127.0.0.1 3306` で確認
    - 既に使用中ならユーザーに案内し、停止または別ポート利用を判断してもらう
 
-### 2. compose.yaml の作成
+### 2. DB コンテナの起動
 
-プロジェクトルートに `compose.yaml` を作成する。
-
-```yaml
-services:
-  db:
-    image: mysql:8.4
-    container_name: bookkeeper-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: bookkeeper_development
-      MYSQL_USER: app
-      MYSQL_PASSWORD: app_password
-    ports:
-      - "127.0.0.1:3306:3306"
-    volumes:
-      - db-data:/var/lib/mysql
-      - ./docker/mysql/conf.d:/etc/mysql/conf.d:ro
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_0900_ai_ci
-      - --default-authentication-plugin=caching_sha2_password
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-uroot", "-proot_password"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
-volumes:
-  db-data:
-```
-
-ポイント:
-- `ports` は `127.0.0.1:3306` にバインド（外部公開しない）
-- charset / collation を `docs/stack.md` の規約と一致
-- `healthcheck` を入れて起動完了の判定を簡単にする
-
-あわせて `docker/mysql/conf.d/.keep` を作成しておく（追加設定を入れたくなったときの拡張ポイント）。
-
-### 3. DB コンテナの起動
+`my-app/` ディレクトリで以下を実行:
 
 1. `docker compose up -d db` で DB コンテナを起動
 2. DB が ready になるまで待機:
@@ -81,7 +53,9 @@ volumes:
 - ポート競合（`docker compose logs db` で確認）
 - ボリュームに前回データが残っていてユーザ作成がスキップされた（`docker compose down -v` で初期化）
 
-### 4. Rails アプリ生成
+### 3. Rails アプリ生成
+
+`my-app/` 内で実行:
 
 ```sh
 rails new . \
@@ -94,118 +68,84 @@ rails new . \
   --force
 ```
 
-既存ファイル（`CLAUDE.md`, `docs/`, `.claude/`, `compose.yaml`, `docker/`）は上書きしないよう注意。
+既存ファイル（`CLAUDE.md`, `docs/`, `.claude/`, `compose.yaml`, `docker/`, `.ruby-version`）は上書きしないよう注意。
 
-Rails 8.1 ではデフォルトで Solid Queue / Solid Cache / Solid Cable が組み込まれる。
-本プロジェクトでは使わない方針だが、**生成されたファイル・Gem・マイグレーションは
-削除せずそのまま残す**（詳細は `docs/stack.md` の「ジョブ・キャッシュ・WebSocket」
-セクション参照）。具体的には:
+Rails 8.1 では Solid Queue / Solid Cache / Solid Cable がデフォルト組み込み。本プロジェクトでは使わない方針だが、生成された Gem / 設定ファイル / マイグレーションは**削除せずそのまま残す**（詳細は `docs/stack.md` の「ジョブ・キャッシュ・WebSocket」セクション）。
 
-- `Gemfile` の `solid_queue`, `solid_cache`, `solid_cable` は残す
-- `config/cache.yml`, `config/queue.yml`, `config/cable.yml` は残す
-- 関連マイグレーションは `db:migrate` でそのまま適用する
-- `Procfile.dev` に `bin/jobs`（Solid Queue ワーカー）の行が含まれていた場合は**削除する**
-  （ワーカーは起動しない方針のため）
+例外として、`Procfile.dev` に `bin/jobs`（Solid Queue ワーカー）が含まれていたら削除する。
 
-### 5. config/database.yml の調整
+### 4. config/database.yml の調整
 
-- `encoding: utf8mb4` を明示
-- `collation: utf8mb4_0900_ai_ci` を明示
-- `host` / `username` / `password` / `port` を環境変数経由で読み込む形に変更
-- Docker の DB は `127.0.0.1:3306` でホスト側に公開されているため、ホスト Rails からはローカル MySQL と同じ接続情報で扱える
-- `docs/stack.md` の「MySQL 設定の規約」セクションの YAML サンプルに従う
+`docs/stack.md` の「MySQL 設定の規約」セクションに記載の YAML サンプル通りに修正する。要点:
 
-Rails 8 では `cache`, `queue`, `cable` 用の追加 DB が `config/database.yml` に
-別接続として定義されている場合がある。本プロジェクトでは**すべて同一の MySQL を使う**
-構成に統一する。SQLite を使う設定が残っている場合は MySQL アダプタの設定に
-書き換える（同じ MySQL の同じ DB を使えば良い）。
+- `encoding: utf8mb4` / `collation: utf8mb4_0900_ai_ci` を明示
+- `host` / `username` / `password` / `port` を環境変数経由で読み込む
 
-### 6. Gemfile に追加
+Rails 8 が `cache` / `queue` / `cable` 用に別 DB（SQLite など）を定義している場合は、すべて同一の MySQL を使う構成に統一する。
 
-`docs/stack.md` 参照:
+### 5. Gemfile への追加
 
-- `devise`
-- `pundit`
-- `kaminari`
-- `ransack`
-- `image_processing`
+`docs/stack.md` の「フレームワーク・主要 Gem」「開発・テスト用」の表を参照し、`rails new` で追加されていないものを追記:
+
+- `devise`, `pundit`, `kaminari`, `ransack`, `image_processing`
 - 開発・テスト群: `factory_bot_rails`, `faker`, `letter_opener`, `brakeman`, `bundler-audit`
-- `mysql2` は `rails new --database=mysql` で既に追加済みのはず、確認のみ
 
 その後 `bundle install`。
 
-### 7. 各種初期化
+### 6. 各種初期化
 
-7-1. **Devise の初期セットアップ**:
-   - `bin/rails generate devise:install`
-   - `config/environments/development.rb` に `config.action_mailer.default_url_options = { host: "localhost", port: 3000 }`
-   - `letter_opener` を development の delivery_method に設定
-   - Devise のメール送信は**同期で良い**（`deliver_now`）。`deliver_later` への切り替えはしない
+- **Devise**: `bin/rails generate devise:install`。`config/environments/development.rb` に `config.action_mailer.default_url_options = { host: "localhost", port: 3000 }` を追記。`letter_opener` を development の delivery_method に設定。メール送信は同期送信（`deliver_now`）で良い。
+- **Pundit**: `bin/rails generate pundit:install`。`ApplicationController` に `include Pundit::Authorization` と `after_action :verify_authorized, except: :index, unless: :devise_controller?` を追加。
+- **Tailwind**: `rails new --css=tailwind` で導入済みのはず。確認のみ。
 
-7-2. **Pundit の初期セットアップ**:
-   - `bin/rails generate pundit:install`
-   - `ApplicationController` に `include Pundit::Authorization` と `after_action :verify_authorized, except: :index, unless: :devise_controller?` を追加
+### 7. .env の準備
 
-7-3. **Tailwind の確認**: `bin/rails tailwindcss:install` 済みであることを確認（rails new で実施済みのはず）。
+ルート同梱の `env.example` を `my-app/.env` にコピーする:
 
-### 8. .env / .env.example の作成
-
-```
-DATABASE_URL=mysql2://app:app_password@127.0.0.1:3306/bookkeeper_development
-DB_USERNAME=app
-DB_PASSWORD=app_password
-DB_HOST=127.0.0.1
-DB_PORT=3306
-RAILS_MASTER_KEY=（config/master.key の中身）
-DEFAULT_FROM_EMAIL=no-reply@example.local
+```sh
+cp ../env.example .env
 ```
 
-`.env` は `.gitignore` 済みであることを確認、`.env.example` は同期して commit 対象に含める。
+`RAILS_MASTER_KEY` の値は `config/master.key` から読み取って `.env` に書き込む。`.env` は `.gitignore` 済みであることを確認。
 
-### 9. bin/setup の Docker 対応
+### 8. bin/setup の Docker 対応
 
-Rails が生成した `bin/setup` の冒頭に DB コンテナの起動と待機を組み込む:
+`rails new` が生成した `bin/setup` に、DB コンテナ起動と ready 待機を組み込む。最低限以下の処理が `bin/rails db:prepare` の前に来るようにする:
 
 ```ruby
-# bin/setup の DB 関連部分（抜粋）
-puts "\n== Starting database container =="
 system!("docker compose up -d db")
 
-puts "\n== Waiting for database to be ready =="
 30.times do |i|
   break if system("docker compose exec -T db mysqladmin ping -uroot -proot_password > /dev/null 2>&1")
   abort "Database did not become ready in 30 seconds" if i == 29
   sleep 1
 end
 
-puts "\n== Preparing database =="
 system! "bin/rails db:prepare"
 ```
 
-### 10. DB の作成と確認
+### 9. DB の作成と起動確認
 
 1. `bin/rails db:create`
-   - `bookkeeper_development` は compose.yaml 側で既に作成済みだが、`bookkeeper_test` は Rails 側で作る必要がある
-   - 失敗する場合の典型原因: コンテナ未起動 / `.env` の認証情報不一致 / `app` ユーザに `bookkeeper_test` への CREATE 権限がない
-   - 後者の場合、`app` ユーザにテスト DB 作成権限を付与:
+   - `bookkeeper_development` は compose.yaml 側で作成済み、`bookkeeper_test` はここで作る
+   - 失敗時の典型原因: コンテナ未起動 / `.env` の認証情報不一致 / `app` ユーザに test DB 作成権限がない
+   - 権限不足の場合、root ユーザで以下を実行:
      ```sh
      docker compose exec db mysql -uroot -proot_password -e \
        "GRANT ALL PRIVILEGES ON \`bookkeeper\\_%\`.* TO 'app'@'%'; FLUSH PRIVILEGES;"
      ```
-   - エラー時は勝手に `mysql.user` をいじらず、ユーザーに状況を報告して指示を仰ぐ
-
+   - エラー時は勝手に `mysql.user` をいじらず、状況を報告して指示を仰ぐ
 2. **起動確認**: `bin/dev` をバックグラウンドで立ち上げ、`curl -sS -o /dev/null -w "%{http_code}" http://localhost:3000` が 200 を返すことを確認後、サーバを停止。
 
 ## このフェーズの完了基準
 
-- [ ] `compose.yaml` がプロジェクトルートに存在
 - [ ] `docker compose up -d db` で DB が起動し、`mysqladmin ping` が成功する
 - [ ] `bin/setup` で DB 起動 → セットアップ完了まで一気通貫で動く
 - [ ] `bin/dev` で http://localhost:3000 が 200
 - [ ] `bin/rails db:create` が成功（development / test 両方）
 - [ ] `Gemfile.lock` がコミット対象に入っている
 - [ ] Devise / Pundit の初期化済み
-- [ ] `.env.example` と `.gitignore` が整備されている
+- [ ] `my-app/.env` が存在し、`.gitignore` で除外されている
 - [ ] `Procfile.dev` に Solid Queue ワーカー（`bin/jobs`）の行が**含まれていない**
 
 ## やらないこと
@@ -215,7 +155,8 @@ system! "bin/rails db:prepare"
 - Seeds（Phase 4 で実施）
 - Rails 本体のコンテナ化（プロジェクト方針として行わない）
 - Solid Queue ワーカーの起動設定（本プロジェクトでは非同期ジョブを使わない）
-- Sidekiq / Redis の追加（Solid 系を残すだけで触らない）
+- Sidekiq / Redis の追加
+- 同梱ファイル（`compose.yaml`, `.ruby-version`, `env.example`）の編集
 
 ## 完了後
 

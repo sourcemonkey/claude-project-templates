@@ -4,7 +4,7 @@ description: フェーズ2 - DB スキーマからモデル・マイグレーシ
 
 # Phase 2: モデルとマイグレーション
 
-`docs/db-schema.md` の定義に厳密に従ってマイグレーションとモデルを作成する。
+`docs/db-schema.md` の定義に厳密に従ってマイグレーションとモデルを作成する。テーブル定義・カラム制約・インデックス・enum 値・アソシエーションはすべて `docs/db-schema.md` が一次情報。
 
 ## 実行順序
 
@@ -23,78 +23,70 @@ description: フェーズ2 - DB スキーマからモデル・マイグレーシ
 
 ### Devise User
 
-```
+```sh
 bin/rails generate devise User name:string role:integer
 ```
 
-生成されたマイグレーションを編集:
-- `role` に `null: false, default: 0` を追加
-- インデックスは Devise 生成済み
+生成されたマイグレーションを `docs/db-schema.md` の `users` テーブル定義に合わせて補正（`role` の `null: false, default: 0` など）。
 
-User モデルに追記:
-```ruby
-enum role: { member: 0, admin: 1 }
-validates :name, presence: true
-has_many :lendings, dependent: :restrict_with_error
-has_many :notifications, dependent: :destroy
-```
+User モデルに `docs/db-schema.md` のバリデーション要点とアソシエーションを反映。`role` は enum、`lendings` / `notifications` の `has_many` を追加。
 
 ### 残りのモデル
 
-各モデルについて `bin/rails generate model XXX ...` で生成し、生成されたマイグレーションを `docs/db-schema.md` の定義（NOT NULL、UNIQUE、CHECK 制約、インデックス）に合わせて手書きで補正する。
+各モデルを `bin/rails generate model ...` で雛形作成し、`docs/db-schema.md` の定義（NOT NULL、UNIQUE、CHECK 制約、インデックス、enum 値）に合わせて手書きで補正する。
 
-ジェネレータの自動生成だけでは制約が足りないので、必ず以下を確認:
+ジェネレータの自動生成だけでは制約が足りないので、以下を必ず確認:
 
 - すべての FK は `foreign_key: true`
 - 必須カラムは `null: false`
 - ユニーク制約と CHECK 制約はマイグレーションに明示
 - インデックスは `docs/db-schema.md` の通り
 
-### Books の CHECK 制約
+### CHECK 制約の書き方
+
+`books` テーブルの `available_copies` には MySQL の CHECK 制約を 2 つ付ける。マイグレーション内での書き方:
 
 ```ruby
-add_check_constraint :books, "available_copies >= 0", name: "books_available_copies_non_negative"
-add_check_constraint :books, "available_copies <= total_copies", name: "books_available_lte_total"
+add_check_constraint :books, "available_copies >= 0",
+  name: "books_available_copies_non_negative"
+add_check_constraint :books, "available_copies <= total_copies",
+  name: "books_available_lte_total"
 ```
 
 ### Lending の state 遷移
 
-state は enum で:
-```ruby
-enum state: { requested: 0, approved: 1, returned: 2, rejected: 3, overdue: 4 }
-```
-
-state 遷移の妥当性は `state_machines` 等を使わず、Model のメソッド（`approve!`, `reject!`, `return!`）として実装。各メソッド内で「現在の state が許容される遷移元か」をチェック。
+state は `docs/db-schema.md` 定義の enum 値で実装する。state 遷移の妥当性は `state_machines` 等の gem を使わず、Model のメソッド（`approve!`, `reject!`, `return!`）として実装する。各メソッド内で「現在の state が許容される遷移元か」をチェックし、不正なら例外または false を返す。
 
 ### アソシエーション
 
-`docs/db-schema.md` の「アソシエーション」セクションの通りに、各モデルに `has_many` / `belongs_to` / `has_many :through` を記述。
+`docs/db-schema.md` の「アソシエーション」セクションの通りに、各モデルに `has_many` / `belongs_to` / `has_many :through` を記述する。
 
 ### `dependent` オプション
 
-- `User.has_many :lendings` → `dependent: :restrict_with_error`（貸出履歴があるユーザーは削除不可）
-- `User.has_many :notifications` → `dependent: :destroy`
-- `Book.has_many :lendings` → `dependent: :restrict_with_error`
-- `Book.has_many :book_tags` → `dependent: :destroy`
-- `Category.has_many :books` → `dependent: :restrict_with_error`
+削除時の挙動は以下の方針:
+
+| アソシエーション | dependent |
+|---|---|
+| `User.has_many :lendings` | `:restrict_with_error`（貸出履歴があるユーザーは削除不可） |
+| `User.has_many :notifications` | `:destroy` |
+| `Book.has_many :lendings` | `:restrict_with_error` |
+| `Book.has_many :book_tags` | `:destroy` |
+| `Category.has_many :books` | `:restrict_with_error` |
 
 ### マイグレーション実行
 
-```
+```sh
 bin/rails db:migrate
 ```
 
 エラーが出たら止めて報告。勝手に `db:reset` しない。
 
-`rails new` で生成済みの Solid Queue / Solid Cache / Solid Cable 用マイグレーション
-（`solid_queue_*`, `solid_cache_entries`, `solid_cable_messages` など）も
-そのまま順序通りに `db:migrate` で適用される。**これらのマイグレーションには
-手を加えない**。本プロジェクトではテーブルを実際には使わないが、Rails 側で
-存在を前提とした初期化処理があるため削除しない。
+`rails new` 同梱の Solid Queue / Solid Cache / Solid Cable 用マイグレーション（`solid_queue_*`, `solid_cache_entries`, `solid_cable_messages` 等）もそのまま順に適用される。**これらには手を加えない**。本プロジェクトではテーブルを使わないが、削除しない。
 
 ### モデルテスト
 
-各モデルに最低限のバリデーションテストを書く（`test/models/`）。
+各モデルに最低限のバリデーションテストを書く（`test/models/`）。網羅すべき観点:
+
 - presence
 - uniqueness
 - enum 定義の確認
@@ -106,7 +98,7 @@ bin/rails db:migrate
 
 - [ ] `bin/rails db:migrate:status` で全マイグレーションが up（業務テーブル + Solid 系テーブル）
 - [ ] `bin/rails test:models` が all green
-- [ ] `db/schema.rb` が生成され、`docs/db-schema.md` の定義と一致
+- [ ] `db/schema.rb` が `docs/db-schema.md` の定義と一致
 - [ ] 各モデルのアソシエーション・バリデーション・enum が定義済み
 
 ## やらないこと
@@ -114,8 +106,7 @@ bin/rails db:migrate
 - Controller / View（Phase 3 で実施）
 - Service オブジェクト（Phase 3 で実施）
 - Seeds（Phase 4 で実施）
-- `rails new` が生成した Solid Queue / Solid Cache / Solid Cable の
-  マイグレーション・モデル・設定ファイルへの手出し（そのまま放置する）
+- Solid Queue / Solid Cache / Solid Cable のマイグレーション・モデル・設定ファイルへの手出し
 
 ## 完了後
 
