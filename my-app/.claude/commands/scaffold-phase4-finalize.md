@@ -94,8 +94,8 @@ end
 - メンバー: 自分の貸出を返却
 - 管理者: ログイン → 申請一覧 → 承認 → 通知が作られ在庫が減ること
 - 管理者: 書籍 CRUD（作成 → 編集 → 削除）
-- 認可: 非 admin が `/admin` にアクセスして 403 になる
-- 認可: 他人の貸出詳細にアクセスして 404 / 403 になる
+- 認可: 非 admin が `/admin` にアクセスすると `root_path` へリダイレクトされる
+- 認可: 他人の貸出詳細にアクセスすると 403（Pundit により `root_path` へリダイレクト）または 404 になる
 
 ### 3. ダッシュボードの実データ表示
 
@@ -109,9 +109,8 @@ end
 `bin/setup` を以下が一発で動くように整備:
 
 1. `bundle install`
-2. `yarn install`（必要なら）
-3. `bin/rails db:prepare`
-4. `bin/rails db:seed`
+2. `bin/rails db:prepare`
+3. `bin/rails db:seed`
 
 DB コンテナの起動と待機は Phase 1 で既に組み込み済み。
 

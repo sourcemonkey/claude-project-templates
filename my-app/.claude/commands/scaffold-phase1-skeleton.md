@@ -62,7 +62,7 @@ rails new . \
   --database=mysql \
   --css=tailwind \
   --javascript=importmap \
-  --skip-test=false \
+  --no-skip-test \
   --skip-jbuilder \
   --skip-keeps \
   --force
