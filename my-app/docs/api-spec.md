@@ -48,6 +48,7 @@ end
 - パラメータ: `lending[book_id]`, `lending[note]`
 - 成功時: `redirect_to lending_path(@lending), notice: "借用申請を送信しました"`
 - 失敗時: 422、書籍詳細にフォーム付きで再描画
+- 実装: `LendingRequestService` で実装
 - 業務ルール:
   - 在庫 1 以上必須
   - 同一ユーザー × 同一書籍の active な lending（requested / approved / overdue）が既にある場合は不可
@@ -63,11 +64,13 @@ end
 - Controllerアクション名: `do_return`（`return` はRuby予約語のため `patch :do_return, path: "return"` で定義）
 - 認証: 要ログイン、本人のみ
 - 副作用: state を `returned`、`returned_at` 設定、`books.available_copies += 1`
+- 実装: `LendingReturnService` で実装
 
 ### `PATCH /lendings/:id/reject`（admin）
 
 - 認証: 要 admin
 - 副作用: state を `rejected`、通知作成
+- 実装: `LendingRejectionService` で実装
 
 ### `PATCH /notifications/:id/read`
 

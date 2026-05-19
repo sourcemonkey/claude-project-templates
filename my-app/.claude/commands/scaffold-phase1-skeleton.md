@@ -96,13 +96,14 @@ Rails 8 が `cache` / `queue` / `cable` 用に別 DB（SQLite など）を定義
 
 ### 7. .env の準備
 
-ルート同梱の `env.example` を `my-app/.env` にコピーする:
+ルート同梱の `env.example` を `my-app/.env` と `my-app/.env.example` にコピーする:
 
 ```sh
 cp ../env.example .env
+cp ../env.example .env.example
 ```
 
-`RAILS_MASTER_KEY` の値は `config/master.key` から読み取って `.env` に書き込む。`.env` は `.gitignore` 済みであることを確認。
+`RAILS_MASTER_KEY` の値は `config/master.key` から読み取って `.env` に書き込む（`.env.example` は `RAILS_MASTER_KEY=` のまま空にしておく）。`.env` は `.gitignore` 済みであることを確認。`.env.example` は git 管理対象に含める。
 
 > **注意: `DATABASE_URL` を `.env` に追加しないこと**
 >
@@ -148,6 +149,7 @@ system! "bin/rails db:prepare"
 - [ ] `Gemfile.lock` がコミット対象に入っている
 - [ ] Devise / Pundit の初期化済み
 - [ ] `my-app/.env` が存在し、`.gitignore` で除外されている
+- [ ] `my-app/.env.example` が存在し、コミット対象に含まれている
 - [ ] `Procfile.dev` に Solid Queue ワーカー（`bin/jobs`）の行が**含まれていない**
 
 ## やらないこと
