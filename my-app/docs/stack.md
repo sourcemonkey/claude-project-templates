@@ -29,7 +29,6 @@
 | `pundit` | 認可 | ✅ |
 | `kaminari` | ページネーション | ✅ |
 | `ransack` | 検索 | ✅ |
-| `image_processing` | Active Storage 用 | ✅ |
 
 ### 開発・テスト用
 

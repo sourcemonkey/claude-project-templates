@@ -132,6 +132,8 @@ audit_logs (独立、polymorphic)
 | changes_json | json | |
 | created_at | datetime | |
 
+> 監査ログは不変レコードのため `updated_at` を持たない。マイグレーションでは `t.timestamps` を使わず `t.datetime :created_at, null: false` と明示すること。
+
 インデックス: `(target_type, target_id)`, `user_id`
 
 ## アソシエーション

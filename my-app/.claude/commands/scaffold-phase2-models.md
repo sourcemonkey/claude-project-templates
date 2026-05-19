@@ -32,6 +32,7 @@ User モデルに `docs/db-schema.md` のバリデーション要点とアソシ
 - 必須カラムは `null: false`
 - ユニーク制約と CHECK 制約はマイグレーションに明示
 - インデックスは `docs/db-schema.md` の通り
+- `audit_logs` は `updated_at` を持たないため `t.timestamps` ではなく `t.datetime :created_at, null: false` を使う
 
 ### CHECK 制約の書き方
 
