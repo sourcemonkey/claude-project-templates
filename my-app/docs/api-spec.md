@@ -69,6 +69,13 @@ end
 - 認証: 要 admin
 - 副作用: state を `rejected`、通知作成
 
+### `PATCH /notifications/:id/read`
+
+- 認証: 要ログイン、本人のみ
+- 副作用: `read_at = Time.current` を設定する
+- 成功時: `redirect_to notifications_path, notice: "既読にしました"`
+- 失敗時: 422
+
 ## 認可マトリクス
 
 | リソース | member | admin |

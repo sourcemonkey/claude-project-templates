@@ -90,6 +90,7 @@ Rails 8 が `cache` / `queue` / `cable` 用に別 DB（SQLite など）を定義
 ### 6. 各種初期化
 
 - **Devise**: `bin/rails generate devise:install`。`config/environments/development.rb` に `config.action_mailer.default_url_options = { host: "localhost", port: 3000 }` を追記。`letter_opener` を development の delivery_method に設定。メール送信は同期送信（`deliver_now`）で良い。
+- **devise-i18n**: `config/application.rb` の `Application` クラス内に `config.i18n.default_locale = :ja` を追記する。これにより Devise のビュー・バリデーションメッセージが日本語化される。
 - **Pundit**: `bin/rails generate pundit:install`。ApplicationController への設定は Phase 3 でまとめて行う。
 - **Tailwind**: `rails new --css=tailwind` で導入済みのはず。確認のみ。
 

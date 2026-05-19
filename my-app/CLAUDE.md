@@ -36,7 +36,10 @@
 - [ ] `bin/dev` で起動し、ログインから主要画面遷移まで動作
 - [ ] `db:seed` で各画面に表示すべきサンプルデータが入る
 - [ ] `bin/rails test` が all green
+- [ ] `bin/rails test:system` が all green
+- [ ] カバレッジ 80% 以上（`coverage/index.html` で確認）
 - [ ] `bin/rubocop` が違反 0
+- [ ] `bin/brakeman --no-pager` で High 警告なし
 - [ ] README に「起動方法」「テストアカウント」が記載されている
 
 ## 重要な制約

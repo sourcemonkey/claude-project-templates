@@ -37,7 +37,9 @@ URL プレフィックス: `/admin/`
 | `PATCH /admin/categories/:id` | カテゴリ更新 | |
 | `DELETE /admin/categories/:id` | カテゴリ削除 | |
 | `GET /admin/tags` | タグ一覧 | |
-| `(同様 CRUD)` | | |
+| `POST /admin/tags` | タグ作成 | |
+| `PATCH /admin/tags/:id` | タグ更新 | |
+| `DELETE /admin/tags/:id` | タグ削除 | |
 | `GET /admin/books` | 蔵書一覧 | |
 | `GET /admin/books/new` | 蔵書登録 | |
 | `POST /admin/books` | 蔵書作成 | |
