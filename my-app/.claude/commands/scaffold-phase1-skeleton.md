@@ -68,7 +68,7 @@ rails new . \
   --force
 ```
 
-既存ファイル（`CLAUDE.md`, `docs/`, `.claude/`, `compose.yaml`, `docker/`, `.ruby-version`）は上書きしないよう注意。
+`--force` により Rails が生成するファイルは上書きされる。`CLAUDE.md`, `docs/`, `.claude/`, `compose.yaml`, `docker/` は Rails が生成しないため上書きされない。`.ruby-version` は Rails も生成するが、Step 1 で Ruby 3.3.x を確認済みであれば内容は同一になる。
 
 Rails 8.1 では Solid Queue / Solid Cache / Solid Cable がデフォルト組み込み。本プロジェクトでは使わない方針だが、生成された Gem / 設定ファイル / マイグレーションは**削除せずそのまま残す**（詳細は `docs/stack.md` の「ジョブ・キャッシュ・WebSocket」セクション）。
 
@@ -137,7 +137,7 @@ system! "bin/rails db:prepare"
        "GRANT ALL PRIVILEGES ON \`<prefix>\\_%\`.* TO 'app'@'%'; FLUSH PRIVILEGES;"
      ```
    - エラー時は勝手に `mysql.user` をいじらず、状況を報告して指示を仰ぐ
-2. **起動確認**: `bin/dev` をバックグラウンドで立ち上げ、`curl -sS -o /dev/null -w "%{http_code}" http://localhost:3000` が 200 を返すことを確認後、サーバを停止。
+2. **起動確認**: `bin/dev` をバックグラウンドで立ち上げ、`curl -sS -o /dev/null -w "%{http_code}" http://localhost:3000` が 200 を返すことを確認後、サーバを停止（`kill %1` または `pkill -f puma`）。
 
 ## このフェーズの完了基準
 
