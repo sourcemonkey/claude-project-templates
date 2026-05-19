@@ -37,6 +37,17 @@ Rails 本体はホスト側で動き、`127.0.0.1:3306` 経由でコンテナの
 - 公開メソッドは `call` 一つに揃える。
 - 結果は明示的な値オブジェクト（成功/失敗 + メッセージ）で返す。
 
+#### 本プロジェクトの Service 一覧
+
+| クラス名 | 責務 |
+|---|---|
+| `LendingRequestService` | 借用申請（在庫チェック + Lending 作成） |
+| `LendingApprovalService` | 承認（state 変更 + 在庫減算 + 通知 + 監査ログ、トランザクション内） |
+| `LendingReturnService` | 返却（state 変更 + 在庫増加） |
+| `LendingRejectionService` | 却下（state 変更 + 通知） |
+
+各 Service の副作用の詳細は `@docs/api-spec.md` の「エンドポイント詳細」参照。
+
 ### Model (`app/models/`)
 
 - バリデーション、アソシエーション、スコープ、単純な属性ベースのロジック。
@@ -73,6 +84,13 @@ Rails 本体はホスト側で動き、`127.0.0.1:3306` 経由でコンテナの
 - 業務エラー（在庫不足など）は例外ではなく結果オブジェクトで返す。
 - 想定外エラーは Rails の標準処理に任せる（カスタム rescue を散らさない）。
 - 404 / 422 / 500 のカスタムエラーページを用意する。
+
+### 認可エラーの挙動
+
+| エラーの種類 | 挙動 | 実装箇所 |
+|---|---|---|
+| `Pundit::NotAuthorizedError`（一般認可エラー） | `flash[:alert]` を表示して `root_path` へリダイレクト | `ApplicationController#user_not_authorized` |
+| 管理者権限不足 | `flash[:alert]` を表示して `root_path` へリダイレクト | `Admin::BaseController#require_admin` |
 
 ## 非同期処理
 

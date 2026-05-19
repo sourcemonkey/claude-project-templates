@@ -96,6 +96,16 @@ audit_logs (独立、polymorphic)
 
 インデックス: `user_id`, `book_id`, `state`
 
+#### state 遷移ルール
+
+| 現在の state | 遷移先 | 操作 |
+|---|---|---|
+| `requested` | `approved` | 管理者承認 |
+| `requested` | `rejected` | 管理者却下 |
+| `approved` / `overdue` | `returned` | メンバー返却 |
+
+`returned` と `rejected` は終端 state（以降の遷移なし）。`overdue` への変更はバッチ相当の操作（seeds では state を直接指定して良い）。
+
 ### notifications
 
 | カラム | 型 | 制約・既定値 |
@@ -158,3 +168,21 @@ Notification
 - `Book`: title / author / category 必須、`total_copies >= 1`、`available_copies >= 0`、ISBN は形式チェック（あれば）
 - `Lending`: state 遷移バリデーション（requested → approved → returned 等の妥当性）
 - `Tag` / `Category`: name 一意
+
+## 削除時の挙動（`dependent` オプション）
+
+| アソシエーション | dependent | 理由 |
+|---|---|---|
+| `User.has_many :lendings` | `:restrict_with_error` | 貸出履歴があるユーザーは削除不可 |
+| `User.has_many :notifications` | `:destroy` | |
+| `Book.has_many :lendings` | `:restrict_with_error` | 貸出履歴がある書籍は削除不可 |
+| `Book.has_many :book_tags` | `:destroy` | |
+| `Category.has_many :books` | `:restrict_with_error` | 書籍が紐づくカテゴリは削除不可 |
+
+## テスト teardown でのレコード削除順序
+
+FK 制約を持つテーブルは依存先を後に削除する（ER 図の矢印の逆順）:
+
+```
+AuditLog → Notification → Lending → BookTag → Book → Tag → Category → User
+```

@@ -60,6 +60,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   self.use_transactional_tests = false
 
   teardown do
+    # FK依存の逆順（順序の根拠は @docs/db-schema.md の「teardown削除順序」セクション参照）
     [ AuditLog, Notification, Lending, BookTag, Book, Tag, Category, User ].each(&:delete_all)
   end
 end

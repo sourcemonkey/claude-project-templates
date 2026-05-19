@@ -13,34 +13,37 @@
 
 ## フレームワーク・主要 Gem
 
-| Gem | 用途 |
-|---|---|
-| `rails` (~> 8.1) | フレームワーク本体 |
-| `mysql2` | MySQL アダプタ |
-| `puma` | アプリサーバ |
-| `importmap-rails` | JS 配信 |
-| `turbo-rails` | Hotwire / Turbo |
-| `stimulus-rails` | Hotwire / Stimulus |
-| `tailwindcss-rails` | CSS |
-| `devise` | 認証 |
-| `pundit` | 認可 |
-| `kaminari` | ページネーション |
-| `ransack` | 検索 |
-| `image_processing` | Active Storage 用 |
+「手動追加」列が ✅ の Gem は `rails new` で自動追加されないため Gemfile に手動追記する。— は `rails new --database=mysql --css=tailwind --javascript=importmap` で自動追加される。
+
+| Gem | 用途 | 手動追加 |
+|---|---|---|
+| `rails` (~> 8.1) | フレームワーク本体 | — |
+| `mysql2` | MySQL アダプタ | — |
+| `puma` | アプリサーバ | — |
+| `importmap-rails` | JS 配信 | — |
+| `turbo-rails` | Hotwire / Turbo | — |
+| `stimulus-rails` | Hotwire / Stimulus | — |
+| `tailwindcss-rails` | CSS | — |
+| `devise` | 認証 | ✅ |
+| `devise-i18n` | Devise 日本語化 | ✅ |
+| `pundit` | 認可 | ✅ |
+| `kaminari` | ページネーション | ✅ |
+| `ransack` | 検索 | ✅ |
+| `image_processing` | Active Storage 用 | ✅ |
 
 ### 開発・テスト用
 
-| Gem | 用途 |
-|---|---|
-| `rubocop-rails-omakase` | Lint |
-| `brakeman` | セキュリティスキャン |
-| `bundler-audit` | 依存脆弱性チェック |
-| `capybara` | システムテスト |
-| `selenium-webdriver` | ブラウザ駆動 |
-| `factory_bot_rails` | テストデータ |
-| `faker` | ダミーデータ |
-| `letter_opener` | 開発時メール確認 |
-| `simplecov` | テストカバレッジ計測（HTML レポート出力） |
+| Gem | 用途 | 手動追加 |
+|---|---|---|
+| `rubocop-rails-omakase` | Lint | — |
+| `brakeman` | セキュリティスキャン | ✅ |
+| `bundler-audit` | 依存脆弱性チェック | ✅ |
+| `capybara` | システムテスト | — |
+| `selenium-webdriver` | ブラウザ駆動 | — |
+| `factory_bot_rails` | テストデータ | ✅ |
+| `faker` | ダミーデータ | ✅ |
+| `letter_opener` | 開発時メール確認 | ✅ |
+| `simplecov` | テストカバレッジ計測（HTML レポート出力） | ✅ |
 
 ## ジョブ・キャッシュ・WebSocket
 

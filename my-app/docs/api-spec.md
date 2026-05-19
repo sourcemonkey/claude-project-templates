@@ -14,7 +14,7 @@ Rails.application.routes.draw do
     resources :books, only: [:index, :show]
     resources :lendings, only: [:index, :show, :create] do
       member do
-        patch :return
+        patch :do_return, path: "return"
       end
     end
     resources :notifications, only: [:index] do
@@ -60,6 +60,7 @@ end
 
 ### `PATCH /lendings/:id/return`（メンバー）
 
+- Controllerアクション名: `do_return`（`return` はRuby予約語のため `patch :do_return, path: "return"` で定義）
 - 認証: 要ログイン、本人のみ
 - 副作用: state を `returned`、`returned_at` 設定、`books.available_copies += 1`
 

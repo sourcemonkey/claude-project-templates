@@ -85,17 +85,12 @@ Rails 8 が `cache` / `queue` / `cable` 用に別 DB（SQLite など）を定義
 
 ### 5. Gemfile への追加
 
-`docs/stack.md` の「フレームワーク・主要 Gem」「開発・テスト用」の表を参照し、`rails new` で追加されていないものを追記:
-
-- `devise`, `pundit`, `kaminari`, `ransack`, `image_processing`
-- 開発・テスト群: `factory_bot_rails`, `faker`, `letter_opener`, `brakeman`, `bundler-audit`
-
-その後 `bundle install`。
+`docs/stack.md` の「手動追加」列が ✅ の Gem を Gemfile に追記し、`bundle install` を実行する。
 
 ### 6. 各種初期化
 
 - **Devise**: `bin/rails generate devise:install`。`config/environments/development.rb` に `config.action_mailer.default_url_options = { host: "localhost", port: 3000 }` を追記。`letter_opener` を development の delivery_method に設定。メール送信は同期送信（`deliver_now`）で良い。
-- **Pundit**: `bin/rails generate pundit:install`。`ApplicationController` に `include Pundit::Authorization` と `after_action :verify_authorized, except: :index, unless: :devise_controller?` を追加。
+- **Pundit**: `bin/rails generate pundit:install`。ApplicationController への設定は Phase 3 でまとめて行う。
 - **Tailwind**: `rails new --css=tailwind` で導入済みのはず。確認のみ。
 
 ### 7. .env の準備
@@ -133,12 +128,12 @@ system! "bin/rails db:prepare"
 ### 9. DB の作成と起動確認
 
 1. `bin/rails db:create`
-   - `bookkeeper_development` は compose.yaml 側で作成済み、`bookkeeper_test` はここで作る
+   - DB 名は `docs/stack.md` の「接続情報」表参照。development は compose.yaml 側で作成済み、test はここで作る
    - 失敗時の典型原因: コンテナ未起動 / `.env` の認証情報不一致 / `app` ユーザに test DB 作成権限がない
-   - 権限不足の場合、root ユーザで以下を実行:
+   - 権限不足の場合、root ユーザで以下を実行（`<prefix>` は `docs/stack.md` の database 名から導出）:
      ```sh
      docker compose exec db mysql -uroot -proot_password -e \
-       "GRANT ALL PRIVILEGES ON \`bookkeeper\\_%\`.* TO 'app'@'%'; FLUSH PRIVILEGES;"
+       "GRANT ALL PRIVILEGES ON \`<prefix>\\_%\`.* TO 'app'@'%'; FLUSH PRIVILEGES;"
      ```
    - エラー時は勝手に `mysql.user` をいじらず、状況を報告して指示を仰ぐ
 2. **起動確認**: `bin/dev` をバックグラウンドで立ち上げ、`curl -sS -o /dev/null -w "%{http_code}" http://localhost:3000` が 200 を返すことを確認後、サーバを停止。
