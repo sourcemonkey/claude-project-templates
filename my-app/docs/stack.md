@@ -40,6 +40,7 @@
 | `factory_bot_rails` | テストデータ |
 | `faker` | ダミーデータ |
 | `letter_opener` | 開発時メール確認 |
+| `simplecov` | テストカバレッジ計測（HTML レポート出力） |
 
 ## ジョブ・キャッシュ・WebSocket
 

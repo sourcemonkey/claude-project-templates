@@ -14,6 +14,7 @@ PR を出す前（あるいは「実装完了」と報告する前）に、Claud
 
 - [ ] 仕様（docs/）と差分の対応が取れている
 - [ ] `bin/rails test` が green
+- [ ] カバレッジが 80% 以上（`coverage/index.html` で確認）
 - [ ] `bin/rubocop` で違反がない
 - [ ] `bin/brakeman --no-pager` で High 警告がない
 - [ ] 新規追加した routes が `bin/rails routes` で確認できる
