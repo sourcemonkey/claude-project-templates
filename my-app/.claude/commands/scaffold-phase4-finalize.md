@@ -48,6 +48,24 @@ end
 
 設定後、`bin/rails test:system` を空のテストファイルで一度実行してエラーなく起動することを確認してから、各テストを実装する。
 
+#### 2-0-1. `sign_in_as` ヘルパーのテンプレート
+
+Capybara でログイン後の画面操作を行う際、リダイレクト完了を待たずに次の操作を行うと
+断続的に失敗するテストになる。各テストファイルの `private` に以下を必ず含めること:
+
+```ruby
+def sign_in_as(user)
+  visit new_user_session_path
+  fill_in "メールアドレス", with: user.email
+  fill_in "パスワード", with: "password123"
+  click_on "ログイン"
+  assert_no_current_path new_user_session_path, wait: 5  # リダイレクト完了を待つ
+end
+```
+
+`assert_no_current_path ... wait: 5` がないと、ログイン画面からの遷移前に後続の操作が
+走り、ランダムに失敗するテストになる。
+
 #### 2-1. テストシナリオの実装
 
 `docs/screens.md` の主要動線を Capybara で網羅。網羅すべきシナリオ:

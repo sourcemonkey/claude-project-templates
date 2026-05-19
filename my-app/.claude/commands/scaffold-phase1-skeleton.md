@@ -108,6 +108,12 @@ cp ../env.example .env
 
 `RAILS_MASTER_KEY` の値は `config/master.key` から読み取って `.env` に書き込む。`.env` は `.gitignore` 済みであることを確認。
 
+> **注意: `DATABASE_URL` を `.env` に追加しないこと**
+>
+> このプロジェクトの `database.yml` は `DB_HOST` / `DB_USERNAME` / `DB_PASSWORD` / `DB_PORT` の個別変数で接続情報を受け取る設計になっている。
+> `DATABASE_URL` 方式と個別変数方式を混在させると接続設定の優先順位が複雑になりデバッグが困難になる。
+> プロジェクト全体で個別変数方式に統一するため、`DATABASE_URL` は設定しないこと。
+
 ### 8. bin/setup の Docker 対応
 
 `rails new` が生成した `bin/setup` に、DB コンテナ起動と ready 待機を組み込む。最低限以下の処理が `bin/rails db:prepare` の前に来るようにする:
