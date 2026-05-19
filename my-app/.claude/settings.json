@@ -1,12 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep:*)",
-      "Bash(rg:*)",
-      "Bash(find:*)",
-      "Bash(ls:*)",
       "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
       "Bash(head:*)",
+      "Bash(ls:*)",
+      "Bash(rg:*)",
       "Bash(tail:*)",
       "Bash(wc:*)",
       "Bash(bundle install)",
