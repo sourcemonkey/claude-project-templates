@@ -2,19 +2,23 @@
 
 ## レイヤ構成
 
-```
-[ Browser ]
-    │ HTTP (Turbo)
-    ▼
-[ Controller ]  ← Pundit で認可
-    │
-    ├─→ [ Service ]  （複数モデルにまたがる業務ロジック）
-    │       │
-    │       ▼
-    └─→ [ Model (ActiveRecord) ]  ← バリデーション・単純な業務ロジック
-            │
-            ▼
-        [ MySQL (Docker) ]
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 40, 'rankSpacing': 50, 'htmlLabels': true}}}%%
+flowchart TD
+    Browser["Browser"]
+    Controller["<b>Controller</b><br/>Pundit で認可"]
+    Service["<b>Service</b><br/>複数モデルにまたがる業務ロジック"]
+    Model["<b>Model (ActiveRecord)</b><br/>バリデーション・単純な業務ロジック"]
+    DB[("MySQL (Docker)")]
+
+    Browser -->|HTTP / Turbo| Controller
+    Controller --> Service
+    Service --> Model
+    Controller -.->|単純な参照| Model
+    Model --> DB
+
+    classDef box fill:#EEF0FF,stroke:#5B6CFF,stroke-width:1px;
+    class Browser,Controller,Service,Model box;
 ```
 
 開発時、MySQL はホスト側ではなく Docker コンテナで稼働する。
@@ -125,20 +129,29 @@ end
 
 ## インフラ構成（開発環境）
 
-```
-┌──────────────────────────── ホスト OS ─────────────────────────────┐
-│                                                                    │
-│  ┌─────────────────┐         ┌──────────────────────────────────┐ │
-│  │ Rails (bin/dev) │ ─────►  │ Docker Engine                    │ │
-│  │  - puma         │  3306   │  ┌────────────────────────────┐  │ │
-│  │  - tailwind w   │         │  │ container: bookkeeper-db   │  │ │
-│  └─────────────────┘         │  │  - mysql:8.4               │  │ │
-│         │                    │  │  - volume: db-data         │  │ │
-│         │ ファイル編集          │  └────────────────────────────┘  │ │
-│         ▼                    └──────────────────────────────────┘ │
-│  [ エディタ / IDE ]                                                  │
-│                                                                    │
-└────────────────────────────────────────────────────────────────────┘
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 40, 'rankSpacing': 50, 'htmlLabels': true}}}%%
+flowchart LR
+    subgraph Host["ホスト OS"]
+        direction TB
+        subgraph RailsApp["Rails (bin/dev)"]
+            puma["puma"]
+            tailwind["tailwind watch"]
+        end
+        IDE["エディタ / IDE"]
+        RailsApp <-->|ファイル編集| IDE
+    end
+
+    subgraph DockerEngine["Docker Engine"]
+        subgraph Container["container: bookkeeper-db"]
+            mysql[("mysql:8.4<br/>volume: db-data")]
+        end
+    end
+
+    RailsApp -->|127.0.0.1:3306| Container
+
+    classDef app fill:#EEF0FF,stroke:#5B6CFF,stroke-width:1px;
+    class puma,tailwind,IDE app;
 ```
 
 - Rails と DB の間はホストの `127.0.0.1:3306` を経由する（Docker のポートフォワーディング）。
