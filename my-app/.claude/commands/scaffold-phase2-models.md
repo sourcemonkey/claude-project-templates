@@ -51,6 +51,8 @@ add_check_constraint :books, "available_copies <= total_copies",
 
 `state_machines` 等の gem を使わず、Model のメソッド（`approve!`, `reject!`, `return!`）として実装する。各メソッド内で遷移元の state を確認し、不正な場合は `raise` する。
 
+`overdue!` メソッドは作成しない。`overdue` への遷移はバッチ相当の操作（将来 Solid Queue を有効化した際に実装予定）であり、本フェーズでは Seeds で state を直接 `overdue` に設定することで代替する。
+
 ### アソシエーション
 
 `docs/db-schema.md` の「アソシエーション」セクションの通りに、各モデルに `has_many` / `belongs_to` / `has_many :through` を記述する。

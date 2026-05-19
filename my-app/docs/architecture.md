@@ -92,6 +92,24 @@ Rails 本体はホスト側で動き、`127.0.0.1:3306` 経由でコンテナの
 | `Pundit::NotAuthorizedError`（一般認可エラー） | `flash[:alert]` を表示して `root_path` へリダイレクト | `ApplicationController#user_not_authorized` |
 | 管理者権限不足 | `flash[:alert]` を表示して `root_path` へリダイレクト | `Admin::BaseController#require_admin` |
 
+実装例（実装ブレ防止のため固定）:
+
+```ruby
+# app/controllers/application_controller.rb
+def user_not_authorized
+  flash[:alert] = "この操作を行う権限がありません。"
+  redirect_to root_path
+end
+
+# app/controllers/admin/base_controller.rb
+def require_admin
+  unless current_user.admin?
+    flash[:alert] = "管理者のみアクセスできます。"
+    redirect_to root_path
+  end
+end
+```
+
 ## 非同期処理
 
 本フェーズではバックグラウンドジョブを使わない。
