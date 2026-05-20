@@ -232,9 +232,6 @@ init_git_repo() {
 
   cd "$dir"
 
-  # テンプレート同梱の .gitignore に不足エントリがあれば補完する
-  ensure_root_gitignore "$dir"
-
   info "git リポジトリを初期化します: $dir"
   git init --initial-branch=main >/dev/null
 
@@ -279,38 +276,6 @@ init_git_repo() {
   4) git push -u origin main
 
 EOF
-}
-
-# ---- .gitignore の補完 --------------------------------------------------
-# テンプレート同梱の .gitignore が存在する前提で、不足エントリのみを追記する。
-# 重複チェックにより既存エントリは二重追加されない。
-
-ensure_root_gitignore() {
-  local dir="$1"
-  local gi="$dir/.gitignore"
-
-  local entries=(
-    '.DS_Store'
-    'Thumbs.db'
-    '.idea/'
-    '.vscode/'
-    '*.swp'
-    '**/.claude/settings.local.json'
-    '**/CLAUDE.local.md'
-    '.env'
-  )
-
-  touch "$gi"
-  local added=0
-  for e in "${entries[@]}"; do
-    if ! grep -Fxq "$e" "$gi"; then
-      printf '%s\n' "$e" >> "$gi"
-      added=$((added + 1))
-    fi
-  done
-  if [ "$added" -gt 0 ]; then
-    ok ".gitignore を更新しました（追加 ${added} 行）: $gi"
-  fi
 }
 
 # ---- main ----------------------------------------------------------------
