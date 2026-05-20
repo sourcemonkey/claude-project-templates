@@ -10,32 +10,30 @@ Rails.application.routes.draw do
 
   root "home#index"
 
-  authenticate :user do
-    resources :books, only: [:index, :show]
-    resources :lendings, only: [:index, :show, :create] do
-      member do
-        patch :do_return, path: "return"
-      end
+  resources :books, only: [:index, :show]
+  resources :lendings, only: [:index, :show, :create] do
+    member do
+      patch :do_return, path: "return"
     end
-    resources :notifications, only: [:index] do
-      member { patch :read }
-    end
-    resource :profile, only: [:edit, :update]
+  end
+  resources :notifications, only: [:index] do
+    member { patch :read }
+  end
+  resource :profile, only: [:edit, :update]
 
-    namespace :admin do
-      root "dashboard#index"
-      resources :users, only: [:index, :show, :update]
-      resources :categories
-      resources :tags
-      resources :books
-      resources :lendings, only: [:index, :show] do
-        member do
-          patch :approve
-          patch :reject
-        end
+  namespace :admin do
+    root "dashboard#index"
+    resources :users, only: [:index, :show, :update]
+    resources :categories
+    resources :tags
+    resources :books
+    resources :lendings, only: [:index, :show] do
+      member do
+        patch :approve
+        patch :reject
       end
-      resources :audit_logs, only: [:index]
     end
+    resources :audit_logs, only: [:index]
   end
 end
 ```
