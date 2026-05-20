@@ -83,6 +83,8 @@ bin/rubocop -A app/models/ db/migrate/
 
 ### モデルテスト
 
+`generate model` が生成するファクトリは `nil` / `"MyString"` 等のプレースホルダーが入っている。`db-schema.md` の定義に合わせて書き直すこと（Read せず直接 Write で上書きしてよい）。`User` ファクトリのメールシーケンスは `@test.local` ドメインにすること（デフォルトフィクスチャの `user1@example.com` 等と衝突してユニーク制約エラーになる）。
+
 各モデルに最低限のバリデーションテストを書く（`test/models/`）。網羅すべき観点:
 
 - presence

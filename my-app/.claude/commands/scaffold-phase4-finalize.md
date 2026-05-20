@@ -64,8 +64,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 end
 ```
 
-FactoryBot のユーザーファクトリのメールシーケンスは `@test.local` ドメインにすること（デフォルトフィクスチャの `user1@example.com` 等と衝突してユニーク制約エラーになる）。
-
 設定後、`bin/rails test:system` を空のテストファイルで一度実行してエラーなく起動することを確認してから、各テストを実装する。
 
 #### 2-1-1. `sign_in_as` ヘルパーのテンプレート

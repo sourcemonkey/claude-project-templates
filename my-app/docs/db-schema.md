@@ -134,7 +134,7 @@ audit_logs (独立、polymorphic)
 
 > 監査ログは不変レコードのため `updated_at` を持たない。マイグレーションでは `t.timestamps` を使わず `t.datetime :created_at, null: false` と明示すること。
 
-インデックス: `(target_type, target_id)`, `user_id`
+インデックス: `(target_type, target_id)`（`user_id` は `t.references :user` で自動生成されるため `add_index` 不要）
 
 ## アソシエーション
 
