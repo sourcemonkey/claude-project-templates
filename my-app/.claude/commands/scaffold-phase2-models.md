@@ -61,6 +61,10 @@ add_check_constraint :books, "available_copies <= total_copies",
 
 削除時の挙動は `@docs/db-schema.md` の「削除時の挙動」セクション参照。
 
+### Ransack 対応
+
+各モデルの `ransackable_attributes` / `ransackable_associations` は `docs/db-schema.md` の「Ransack 対応」セクション参照。
+
 ### マイグレーション実行
 
 ```sh
@@ -70,6 +74,12 @@ bin/rails db:migrate
 エラーが出たら止めて報告。勝手に `db:reset` しない。
 
 `rails new` 同梱の Solid Queue / Solid Cache / Solid Cable 用マイグレーション（`solid_queue_*`, `solid_cache_entries`, `solid_cable_messages` 等）もそのまま順に適用される。**これらには手を加えない**。本プロジェクトではテーブルを使わないが、削除しない。
+
+### RuboCop 自動修正
+
+```sh
+bin/rubocop -A app/models/ db/migrate/
+```
 
 ### モデルテスト
 

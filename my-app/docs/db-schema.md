@@ -171,6 +171,50 @@ Notification
 - `Lending`: state 遷移バリデーション（requested → approved → returned 等の妥当性）
 - `Tag` / `Category`: name 一意
 
+## Ransack 対応
+
+検索機能を持つ画面で使うモデルに定義する。`has_many` を持つモデルは両方、`belongs_to` のみのモデルは `ransackable_attributes` だけ定義する。
+
+**Book**（`has_many` あり → 両方）:
+
+```ruby
+def self.ransackable_attributes(auth_object = nil)
+  %w[title author publisher isbn description published category_id created_at]
+end
+
+def self.ransackable_associations(auth_object = nil)
+  %w[category tags lendings]
+end
+```
+
+**User**（`has_many` あり → 両方）:
+
+```ruby
+def self.ransackable_attributes(auth_object = nil)
+  %w[name email role created_at]
+end
+
+def self.ransackable_associations(auth_object = nil)
+  %w[lendings notifications]
+end
+```
+
+**Lending**（`belongs_to` のみ → attributes のみ）:
+
+```ruby
+def self.ransackable_attributes(auth_object = nil)
+  %w[state requested_at approved_at due_on returned_at user_id book_id]
+end
+```
+
+**AuditLog**（`belongs_to` のみ → attributes のみ）:
+
+```ruby
+def self.ransackable_attributes(auth_object = nil)
+  %w[action target_type target_id user_id created_at]
+end
+```
+
 ## 削除時の挙動（`dependent` オプション）
 
 | アソシエーション | dependent | 理由 |
