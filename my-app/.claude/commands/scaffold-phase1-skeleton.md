@@ -117,6 +117,10 @@ cp ../env.example .env.example
 
 `RAILS_MASTER_KEY` の値は `config/master.key` から読み取って `.env` に書き込む（`.env.example` は `RAILS_MASTER_KEY=` のまま空にしておく）。`.env` はテンプレート同梱の `.gitignore` で除外済み。`.env.example` は git 管理対象に含める。
 
+```sh
+sed -i '' "s/RAILS_MASTER_KEY=.*/RAILS_MASTER_KEY=$(cat config/master.key)/" .env
+```
+
 > **注意: `DATABASE_URL` を `.env` に追加しないこと**
 >
 > このプロジェクトの `database.yml` は `DB_HOST` / `DB_USERNAME` / `DB_PASSWORD` / `DB_PORT` の個別変数で接続情報を受け取る設計になっている。
