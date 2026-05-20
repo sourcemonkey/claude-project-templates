@@ -1,0 +1,31 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Claude Code local
+**/.claude/settings.local.json
+**/CLAUDE.local.md
+
+# フェーズコマンド実行時に my-app/ へ生成される Rails アプリのファイル
+# （テンプレートファイル以外はテンプレートリポジトリに含めない）
+my-app/.env
+my-app/.env.*
+my-app/Gemfile
+my-app/Gemfile.lock
+my-app/README.md
+my-app/Rakefile
+my-app/config.ru
+my-app/app/
+my-app/bin/
+my-app/config/
+my-app/db/
+my-app/lib/
+my-app/log/
+my-app/public/
+my-app/storage/
+my-app/test/
+my-app/tmp/
+my-app/vendor/

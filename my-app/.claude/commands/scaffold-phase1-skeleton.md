@@ -15,7 +15,8 @@ Rails 本体はホスト側で動かす。
 - `my-app/compose.yaml`
 - `my-app/docker/mysql/conf.d/.keep`
 - `my-app/.ruby-version`
-- ルート直下の `.ruby-version`, `env.example`
+- `my-app/.gitignore`（`.env` 除外・カバレッジ除外など含む）
+- ルート直下の `.ruby-version`, `env.example`, `.gitignore`
 
 これらの内容を確認・編集する必要はない（中身は `docs/stack.md` の規約に合致した状態でコミット済み）。
 
@@ -65,10 +66,13 @@ rails new . \
   --no-skip-test \
   --skip-jbuilder \
   --skip-keeps \
+  --skip-git \
   --force
 ```
 
 `--force` により Rails が生成するファイルは上書きされる。`CLAUDE.md`, `docs/`, `.claude/`, `compose.yaml`, `docker/` は Rails が生成しないため上書きされない。`.ruby-version` は Rails も生成するが、Step 1 で Ruby 3.3.x を確認済みであれば内容は同一になる。
+
+`--skip-git` を指定することで `git init` と `.gitignore` の生成をスキップする。テンプレート同梱の `.gitignore` をそのまま使うためこのフラグが必要。
 
 Rails 8.1 では Solid Queue / Solid Cache / Solid Cable がデフォルト組み込み。本プロジェクトでは使わない方針だが、生成された Gem / 設定ファイル / マイグレーションは**削除せずそのまま残す**（詳細は `docs/stack.md` の「ジョブ・キャッシュ・WebSocket」セクション）。
 
@@ -103,7 +107,7 @@ cp ../env.example .env
 cp ../env.example .env.example
 ```
 
-`RAILS_MASTER_KEY` の値は `config/master.key` から読み取って `.env` に書き込む（`.env.example` は `RAILS_MASTER_KEY=` のまま空にしておく）。`.env` は `.gitignore` 済みであることを確認。`.env.example` は git 管理対象に含める。
+`RAILS_MASTER_KEY` の値は `config/master.key` から読み取って `.env` に書き込む（`.env.example` は `RAILS_MASTER_KEY=` のまま空にしておく）。`.env` はテンプレート同梱の `.gitignore` で除外済み。`.env.example` は git 管理対象に含める。
 
 > **注意: `DATABASE_URL` を `.env` に追加しないこと**
 >

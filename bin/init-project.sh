@@ -232,7 +232,7 @@ init_git_repo() {
 
   cd "$dir"
 
-  # 親ディレクトリ用の .gitignore を整備（既存があれば追記、無ければ新規）
+  # テンプレート同梱の .gitignore に不足エントリがあれば補完する
   ensure_root_gitignore "$dir"
 
   info "git リポジトリを初期化します: $dir"
@@ -281,15 +281,15 @@ init_git_repo() {
 EOF
 }
 
-# ---- 親ディレクトリ用の .gitignore --------------------------------------
+# ---- .gitignore の補完 --------------------------------------------------
+# テンプレート同梱の .gitignore が存在する前提で、不足エントリのみを追記する。
+# 重複チェックにより既存エントリは二重追加されない。
 
 ensure_root_gitignore() {
   local dir="$1"
   local gi="$dir/.gitignore"
 
-  # 既存に追記。重複行は避ける。
   local entries=(
-    '# --- added by init-project.sh ---'
     '.DS_Store'
     'Thumbs.db'
     '.idea/'

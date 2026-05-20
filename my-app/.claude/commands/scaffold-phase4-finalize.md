@@ -36,9 +36,7 @@ SimpleCov.start "rails" do
 end
 ```
 
-`.gitignore` に `coverage/` を追記する。
-
-追記後、`bin/rails test` を一度実行して `coverage/index.html` が生成されることを確認してから次のステップへ進む。
+設定後、`bin/rails test` を一度実行して `coverage/index.html` が生成されることを確認してから次のステップへ進む。
 
 #### 2-1. `application_system_test_case.rb` の設定（テストを書く前に必ず実施）
 
