@@ -38,53 +38,7 @@ end
 
 設定後、`bin/rails test` を一度実行して `coverage/index.html` が生成されることを確認してから次のステップへ進む。
 
-#### 2-1. `application_system_test_case.rb` の設定（テストを書く前に必ず実施）
-
-`rails new` が生成するデフォルトの `test/application_system_test_case.rb` は
-`use_transactional_tests` の設定がない（= デフォルト `true`）。この状態では
-FactoryBot で作ったデータがテストトランザクション内にしか存在せず、
-Selenium ブラウザ（別スレッド）から見えないため**全システムテストが失敗する**。
-
-テストを 1 行も書く前に、以下の内容で上書きすること:
-
-```ruby
-require "test_helper"
-
-class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  include FactoryBot::Syntax::Methods
-
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 1400 ]
-
-  self.use_transactional_tests = false
-
-  teardown do
-    # FK依存の逆順（順序の根拠は @docs/db-schema.md の「teardown削除順序」セクション参照）
-    [ AuditLog, Notification, Lending, BookTag, Book, Tag, Category, User ].each(&:delete_all)
-  end
-end
-```
-
-設定後、`bin/rails test:system` を空のテストファイルで一度実行してエラーなく起動することを確認してから、各テストを実装する。
-
-#### 2-1-1. `sign_in_as` ヘルパーのテンプレート
-
-Capybara でログイン後の画面操作を行う際、リダイレクト完了を待たずに次の操作を行うと
-断続的に失敗するテストになる。各テストファイルの `private` に以下を必ず含めること:
-
-```ruby
-def sign_in_as(user)
-  visit new_user_session_path
-  fill_in "メールアドレス", with: user.email
-  fill_in "パスワード", with: "password123"
-  click_on "ログイン"
-  assert_no_current_path new_user_session_path, wait: 5  # リダイレクト完了を待つ
-end
-```
-
-`assert_no_current_path ... wait: 5` がないと、ログイン画面からの遷移前に後続の操作が
-走り、ランダムに失敗するテストになる。
-
-#### 2-2. テストシナリオの実装
+#### 2-1. テストシナリオの実装
 
 テストを書く前に、テスト対象の View ファイルを Read してボタン名・フィールド label の実際の文字列を確認すること（ボタン名の標準は `docs/screens.md` の「ボタン・ラベルの標準」参照）。推測で書くと不一致による修正ループが発生する。
 

@@ -39,7 +39,15 @@ Rails 本体はホスト側で動き、`127.0.0.1:3306` 経由でコンテナの
 - 複数モデルにまたがる業務処理（例: 貸出処理 = 在庫減算 + 貸出記録作成 + 通知）。
 - 命名は「対象リソース + 操作 + Service」（例: `LendingRequestService`）。
 - 公開メソッドは `call` 一つに揃える。
-- 結果は明示的な値オブジェクト（成功/失敗 + メッセージ）で返す。
+- 結果は明示的な値オブジェクト（成功/失敗 + メッセージ）で返す。`Data.define` で定義するが、`success?` は自動生成されないため明示的に定義する:
+
+  ```ruby
+  Result = Data.define(:success, :message) do
+    def success? = success
+  end
+  ```
+
+  呼び出し側: `result = LendingRequestService.new(...).call` → `result.success?`
 
 #### 本プロジェクトの Service 一覧
 
