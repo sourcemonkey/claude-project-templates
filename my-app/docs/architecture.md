@@ -57,12 +57,14 @@ Rails 本体はホスト側で動き、`127.0.0.1:3306` 経由でコンテナの
 - バリデーション、アソシエーション、スコープ、単純な属性ベースのロジック。
 - 単一モデルで完結する `published?` のようなメソッドはここに置く。
 - コールバックは最小限。副作用の大きい処理は Service に逃がす。
+- Ransack を使うモデルは `ransackable_attributes` と `ransackable_associations` を必ず定義する（未定義だと View レンダリング時に実行時エラーになる）。`has_many` アソシエーションを持つモデルは両方の定義が必要。
 
 ### Policy (`app/policies/`)
 
 - リソースごとに `XxxPolicy` を 1 ファイル。
 - `index?`, `show?`, `create?`, `update?`, `destroy?` を定義。
 - `Scope` を使って一覧の絞り込み（例: 一般ユーザーは自分の貸出のみ閲覧）を表現。
+- `resource :profile` のようなシングルトンリソースは `@profile = current_user`（`User` インスタンス）になるため、`authorize @profile` だけでは Pundit が `UserPolicy` を参照してしまう。`authorize @profile, policy_class: ProfilePolicy` と明示すること。
 
 ### View (`app/views/`)
 

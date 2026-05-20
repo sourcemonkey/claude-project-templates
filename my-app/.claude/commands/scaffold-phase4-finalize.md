@@ -64,6 +64,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 end
 ```
 
+FactoryBot のユーザーファクトリのメールシーケンスは `@test.local` ドメインにすること（デフォルトフィクスチャの `user1@example.com` 等と衝突してユニーク制約エラーになる）。
+
 設定後、`bin/rails test:system` を空のテストファイルで一度実行してエラーなく起動することを確認してから、各テストを実装する。
 
 #### 2-1-1. `sign_in_as` ヘルパーのテンプレート
@@ -85,6 +87,8 @@ end
 走り、ランダムに失敗するテストになる。
 
 #### 2-2. テストシナリオの実装
+
+テストを書く前に、テスト対象の View ファイルを Read してボタン名・フィールド label の実際の文字列を確認すること（ボタン名の標準は `docs/screens.md` の「ボタン・ラベルの標準」参照）。推測で書くと不一致による修正ループが発生する。
 
 `docs/screens.md` の主要動線を Capybara で網羅。網羅すべきシナリオ:
 
