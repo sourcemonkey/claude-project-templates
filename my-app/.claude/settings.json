@@ -30,6 +30,7 @@
       "Bash(curl *)",
       "Bash(lsof *)",
       "Bash(nc *)",
+      "Bash(gem list*)",
       "Bash(ruby -v)",
       "Bash(rbenv versions *)",
       "Edit",
