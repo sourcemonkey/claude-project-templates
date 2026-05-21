@@ -55,7 +55,7 @@ add_check_constraint :books, "available_copies <= total_copies",
 
 ### アソシエーション
 
-`docs/db-schema.md` の「アソシエーション」セクションの通りに、各モデルに `has_many` / `belongs_to` / `has_many :through` を記述する。
+テーブル定義とER図から方向を導出し、各モデルに `has_many` / `belongs_to` / `has_many :through` を記述する。中間テーブル（`book_tags`）は `has_many :through` で結ぶ。`dependent` オプションは `@docs/db-schema.md` の「削除時の挙動」セクション参照。
 
 ### `dependent` オプション
 

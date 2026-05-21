@@ -138,31 +138,7 @@ audit_logs (独立、polymorphic)
 
 ## アソシエーション
 
-```ruby
-User
-  has_many :lendings
-  has_many :notifications
-
-Category
-  has_many :books
-
-Book
-  belongs_to :category
-  has_many :book_tags
-  has_many :tags, through: :book_tags
-  has_many :lendings
-
-Tag
-  has_many :book_tags
-  has_many :books, through: :book_tags
-
-Lending
-  belongs_to :user
-  belongs_to :book
-
-Notification
-  belongs_to :user
-```
+テーブル定義とER図から方向を導出する。中間テーブル（`book_tags`）は `has_many :through` で結ぶ。
 
 ## バリデーション要点
 
@@ -175,45 +151,12 @@ Notification
 
 検索機能を持つ画面で使うモデルに定義する。`has_many` を持つモデルは両方、`belongs_to` のみのモデルは `ransackable_attributes` だけ定義する。
 
-**Book**（`has_many` あり → 両方）:
-
-```ruby
-def self.ransackable_attributes(auth_object = nil)
-  %w[title author publisher isbn description published category_id created_at]
-end
-
-def self.ransackable_associations(auth_object = nil)
-  %w[category tags lendings]
-end
-```
-
-**User**（`has_many` あり → 両方）:
-
-```ruby
-def self.ransackable_attributes(auth_object = nil)
-  %w[name email role created_at]
-end
-
-def self.ransackable_associations(auth_object = nil)
-  %w[lendings notifications]
-end
-```
-
-**Lending**（`belongs_to` のみ → attributes のみ）:
-
-```ruby
-def self.ransackable_attributes(auth_object = nil)
-  %w[state requested_at approved_at due_on returned_at user_id book_id]
-end
-```
-
-**AuditLog**（`belongs_to` のみ → attributes のみ）:
-
-```ruby
-def self.ransackable_attributes(auth_object = nil)
-  %w[action target_type target_id user_id created_at]
-end
-```
+| モデル | ransackable_attributes | ransackable_associations |
+|---|---|---|
+| Book | title, author, publisher, isbn, description, published, category_id, created_at | category, tags, lendings |
+| User | name, email, role, created_at | lendings, notifications |
+| Lending | state, requested_at, approved_at, due_on, returned_at, user_id, book_id | — |
+| AuditLog | action, target_type, target_id, user_id, created_at | — |
 
 ## 削除時の挙動（`dependent` オプション）
 
