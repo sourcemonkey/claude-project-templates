@@ -24,7 +24,7 @@ User モデルに `docs/db-schema.md` のバリデーション要点とアソシ
 
 ### 残りのモデル
 
-各モデルを `bin/rails generate model ...` で雛形作成し、`docs/db-schema.md` の定義（NOT NULL、UNIQUE、CHECK 制約、インデックス、enum 値）に合わせて手書きで補正する。
+各モデルを `bin/rails generate model ...` で雛形作成し、`docs/db-schema.md` の定義（NOT NULL、UNIQUE、CHECK 制約、インデックス、enum 値）に合わせて手動で補正する。
 
 ジェネレータの自動生成だけでは制約が足りないので、以下を必ず確認:
 
