@@ -180,3 +180,36 @@ production:
   password: <%= ENV["BOOKKEEPER_DATABASE_PASSWORD"] %>
   host: <%= ENV["BOOKKEEPER_DATABASE_HOST"] %>
 ```
+
+## SimpleCov 設定（正規形）
+
+`test/test_helper.rb` の SimpleCov 設定。`require "simplecov"` は**他の require より前**に記述しないと計測漏れが発生するため位置に注意。並列テストと組み合わせる際は `parallelize_setup/teardown` が必須（これがないとカバレッジが 0% になる）。
+
+```ruby
+require "simplecov"
+SimpleCov.start "rails" do
+  add_filter "/test/"
+  add_filter "/config/"
+  add_filter "/vendor/"
+  add_group "Services", "app/services"
+  add_group "Policies", "app/policies"
+end
+
+# ... ENV["RAILS_ENV"] / require_relative 等 ...
+
+module ActiveSupport
+  class TestCase
+    parallelize(workers: :number_of_processors)
+
+    parallelize_setup do |worker|
+      SimpleCov.command_name "#{SimpleCov.command_name}-#{worker}"
+    end
+
+    parallelize_teardown do |_worker|
+      SimpleCov.result
+    end
+
+    include FactoryBot::Syntax::Methods
+  end
+end
+```
