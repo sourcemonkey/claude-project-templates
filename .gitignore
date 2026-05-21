@@ -29,3 +29,6 @@ my-app/storage/
 my-app/test/
 my-app/tmp/
 my-app/vendor/
+
+# その他
+log/
