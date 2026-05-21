@@ -57,10 +57,6 @@ add_check_constraint :books, "available_copies <= total_copies",
 
 テーブル定義とER図から方向を導出し、各モデルに `has_many` / `belongs_to` / `has_many :through` を記述する。中間テーブル（`book_tags`）は `has_many :through` で結ぶ。`dependent` オプションは `@docs/db-schema.md` の「削除時の挙動」セクション参照。
 
-### `dependent` オプション
-
-削除時の挙動は `@docs/db-schema.md` の「削除時の挙動」セクション参照。
-
 ### Ransack 対応
 
 各モデルの `ransackable_attributes` / `ransackable_associations` は `docs/db-schema.md` の「Ransack 対応」セクション参照。
