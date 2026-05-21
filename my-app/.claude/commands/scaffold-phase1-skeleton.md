@@ -76,7 +76,7 @@ rails new . \
 
 Rails 8.1 では Solid Queue / Solid Cache / Solid Cable がデフォルト組み込み。本プロジェクトでは使わない方針だが、生成された Gem / 設定ファイル / マイグレーションは**削除せずそのまま残す**（詳細は `docs/stack.md` の「ジョブ・キャッシュ・WebSocket」セクション）。
 
-例外として、`Procfile.dev` に `bin/jobs`（Solid Queue ワーカー）が含まれていたら削除する。
+ただし、`Procfile.dev` に `bin/jobs`（Solid Queue ワーカー）が含まれていたら削除する。
 
 また、`Procfile.dev` の `css:` 行を `docs/stack.md` の「Procfile.dev（正規形）」セクションの通りに修正する（`tailwindcss:watch[always]` が必須な理由も同セクションに記載）。
 

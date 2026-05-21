@@ -69,7 +69,7 @@ bin/rails db:migrate
 
 エラーが出たら止めて報告。勝手に `db:reset` しない。
 
-`rails new` 同梱の Solid Queue / Solid Cache / Solid Cable 用マイグレーション（`solid_queue_*`, `solid_cache_entries`, `solid_cable_messages` 等）もそのまま順に適用される。**これらには手を加えない**。本プロジェクトではテーブルを使わないが、削除しない。
+`rails new` 同梱の Solid Queue / Solid Cache / Solid Cable 用マイグレーション（`solid_queue_*`, `solid_cache_entries`, `solid_cable_messages` 等）もそのまま順に適用される。**これらには手を加えず、削除もしない**。
 
 ### RuboCop 自動修正
 
